@@ -628,75 +628,40 @@ let mobiles = {
       },
     },
   };
-const brandSelect = document.getElementById("brandSelect");
-const modelSelect = document.getElementById("modelSelect");
-const searchBtn = document.getElementById("searchBtn");
-const resultBox = document.getElementById("resultBox");
 
-window.onload = () => {
-    document.getElementById("mainBox").classList.add("show");
-};
+let brand = document.getElementById("brand");
 
-// Load brand names
-Object.keys(mobiles).forEach(brand => {
-    let opt = document.createElement("option");
-    opt.value = brand;
-    opt.textContent = brand.toUpperCase();
-    brandSelect.appendChild(opt);
-});
+let model = document.getElementById("model");
 
-// Load model names when brand changes
-brandSelect.addEventListener("change", () => {
-    let brand = brandSelect.value;
-    modelSelect.innerHTML = `<option value="">Select model</option>`;
-    modelSelect.disabled = true;
-    searchBtn.disabled = true;
+let div = document.getElementById("result");
 
-    if (!brand) return;
+let innerKeys = Object.keys(mobiles);
 
-    Object.keys(mobiles[brand]).forEach(model => {
-        let opt = document.createElement("option");
-        opt.value = model;
-        opt.textContent = model;
-        modelSelect.appendChild(opt);
-    });
-
-    modelSelect.disabled = false;
-});
-
-// Enable button when model selected
-modelSelect.addEventListener("change", () => {
-    searchBtn.disabled = modelSelect.value === "";
-});
-
-// convert object to readable text
-function convertToText(obj) {
-    let out = "";
-    for (let key in obj) {
-        if (typeof obj[key] === "object") {
-            out += `${key}:\n`;
-            for (let sub in obj[key]) {
-                out += `  ${sub}: ${JSON.stringify(obj[key][sub])}\n`;
-            }
-        } else {
-            out += `${key}: ${obj[key]}\n`;
-        }
-    }
-    return out;
+for (let i = 0; i < innerKeys.length; i++) {
+    brand.innerHTML += `<option>${innerKeys[i]}</option>`
 }
 
-// SEARCH FUNCTION
-function search() {
-    let brand = brandSelect.value;
-    let model = modelSelect.value;
+function searchModel(){
 
-    if (!brand || !model) return;
+    let brandValue = brand.value
 
-    let data = mobiles[brand][model];
+    let innerInnerKeys = Object.keys(mobiles[brandValue])
 
-    resultBox.style.display = "block";
-    resultBox.innerHTML = `
-        <h3>${model.toUpperCase()}</h3>
-        <pre>${convertToText(data)}</pre>
-    `;
+    for (let i = 0; i < innerInnerKeys.length; i++) {
+        model.innerHTML =+ `<option>${innerInnerKeys[i]}</option>`
+    }
+}
+
+function getData(){
+    let modelValue = mobiles[brand.value][model.value]
+    console.log(modelValue)
+
+    div.innerHTML +=`<div>
+    <h3>${modelValue.brand}</h3>
+    <h3>${modelValue.operatingSystem}</h3>
+    <h3>${modelValue.processor}</h3>
+    
+    </div>`
+    brand.innerHTML = ''
+    model.innerHTML = `<option>Select Model</option>`
 }
