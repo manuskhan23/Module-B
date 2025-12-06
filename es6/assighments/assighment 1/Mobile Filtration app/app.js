@@ -628,100 +628,75 @@ var mobiles = {
       },
     },
   };
-  document.addEventListener('DOMContentLoaded', () => {
-    const brandSelect = document.getElementById('brandSelect');
-    const modelSelect = document.getElementById('modelSelect');
-    const searchBtn = document.getElementById('searchBtn');
-    const resultDiv = document.getElementById('result');
+const brandSelect = document.getElementById("brandSelect");
+const modelSelect = document.getElementById("modelSelect");
+const searchBtn = document.getElementById("searchBtn");
+const resultBox = document.getElementById("resultBox");
 
+window.onload = () => {
+    document.getElementById("mainBox").classList.add("show");
+};
 
-    Object.keys(mobiles).forEach(brand => {
-        const option = document.createElement('option');
-        option.value = brand;
-        option.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
-        brandSelect.appendChild(option);
-    });
-
-  
-    brandSelect.addEventListener('change', () => {
-        const selectedBrand = brandSelect.value;
-        modelSelect.innerHTML = '<option value="">Select Model</option>';
-        modelSelect.disabled = !selectedBrand;
-        searchBtn.disabled = true;
-
-        if (selectedBrand) {
-            Object.keys(mobiles[selectedBrand]).forEach(model => {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = mobiles[selectedBrand][model].modelName || model;
-                modelSelect.appendChild(option);
-            });
-            modelSelect.disabled = false;
-        }
-    });
-
-  
-    modelSelect.addEventListener('change', () => {
-        searchBtn.disabled = !modelSelect.value;
-    });
-
-
-    searchBtn.addEventListener('click', () => {
-        const brand = brandSelect.value;
-        const model = modelSelect.value;
-        if (brand && model) {
-            const mobileData = mobiles[brand][model];
-            resultDiv.innerHTML = formatMobileData(mobileData);
-        }
-    });
-
-  
-    function formatMobileData(data) {
-        let output = `<p><strong>Brand:</strong> ${data.brand}</p>`;
-        if (data.model) output += `<p><strong>Model:</strong> ${data.model}</p>`;
-        if (data.modelName) output += `<p><strong>Model Name:</strong> ${data.modelName}</p>`;
-        if (data.processor) output += `<p><strong>Processor:</strong> ${data.processor}</p>`;
-        if (data.memory) {
-            output += `<p><strong>Memory:</strong> RAM: ${data.memory.ram}${typeof data.memory.ram === 'string' ? '' : 'GB'}, Storage: ${data.memory.storage}${typeof data.memory.storage === 'string' ? '' : 'GB'}</p>`;
-        }
-        if (data.camera) {
-            if (data.camera.rear) {
-                output += `<p><strong>Rear Camera:</strong> `;
-                if (typeof data.camera.rear === 'string') {
-                    output += data.camera.rear;
-                } else if (data.camera.rear.resolution) {
-                    output += data.camera.rear.resolution;
-                } else {
-                    output += Object.entries(data.camera.rear).map(([key, value]) => `${key}: ${value}MP`).join(', ');
-                }
-                output += `</p>`;
-            }
-            if (data.camera.front) {
-                output += `<p><strong>Front Camera:</strong> ${typeof data.camera.front === 'object' ? data.camera.front.resolution : data.camera.front}MP</p>`;
-            }
-        }
-        if (data.battery) {
-            if (typeof data.battery === 'object') {
-                output += `<p><strong>Battery:</strong> ${data.battery.capacity}, Fast Charging: ${data.battery.fastCharging}</p>`;
-            } else {
-                output += `<p><strong>Battery:</strong> ${data.battery}mAh</p>`;
-            }
-        }
-        if (data.batteryCapacity) output += `<p><strong>Battery Capacity:</strong> ${data.batteryCapacity}mAh</p>`;
-        if (data.fastCharging) output += `<p><strong>Fast Charging:</strong> ${data.fastCharging}</p>`;
-        if (data.display) {
-            output += `<p><strong>Display:</strong> Size: ${data.display.size}, Resolution: ${data.display.resolution}, Type: ${data.display.type || data.display.panelType}`;
-            if (data.display.refreshRate) output += `, Refresh Rate: ${data.display.refreshRate}Hz`;
-            output += `</p>`;
-        }
-        if (data.displaySize) output += `<p><strong>Display Size:</strong> ${data.displaySize} inches</p>`;
-        if (data.displayResolution) output += `<p><strong>Display Resolution:</strong> ${data.displayResolution}</p>`;
-        if (data.displayType) output += `<p><strong>Display Type:</strong> ${data.displayType}</p>`;
-        if (data.operatingSystem) output += `<p><strong>Operating System:</strong> ${data.operatingSystem}</p>`;
-        if (data.specialFeatures) output += `<p><strong>Special Features:</strong> ${data.specialFeatures.join(', ')}</p>`;
-        if (data.fingerprintSensor) output += `<p><strong>Fingerprint Sensor:</strong> ${data.fingerprintSensor ? 'Yes' : 'No'}</p>`;
-        if (data.waterResistance) output += `<p><strong>Water Resistance:</strong> ${data.waterResistance}</p>`;
-        if (data.expandableStorage !== undefined) output += `<p><strong>Expandable Storage:</strong> ${data.expandableStorage ? 'Yes' : 'No'}</p>`;
-        return output;
-    }
+// Load brand names
+Object.keys(mobiles).forEach(brand => {
+    let opt = document.createElement("option");
+    opt.value = brand;
+    opt.textContent = brand.toUpperCase();
+    brandSelect.appendChild(opt);
 });
+
+// Load model names when brand changes
+brandSelect.addEventListener("change", () => {
+    let brand = brandSelect.value;
+    modelSelect.innerHTML = `<option value="">Select model</option>`;
+    modelSelect.disabled = true;
+    searchBtn.disabled = true;
+
+    if (!brand) return;
+
+    Object.keys(mobiles[brand]).forEach(model => {
+        let opt = document.createElement("option");
+        opt.value = model;
+        opt.textContent = model;
+        modelSelect.appendChild(opt);
+    });
+
+    modelSelect.disabled = false;
+});
+
+// Enable button when model selected
+modelSelect.addEventListener("change", () => {
+    searchBtn.disabled = modelSelect.value === "";
+});
+
+// convert object to readable text
+function convertToText(obj) {
+    let out = "";
+    for (let key in obj) {
+        if (typeof obj[key] === "object") {
+            out += `${key}:\n`;
+            for (let sub in obj[key]) {
+                out += `  ${sub}: ${JSON.stringify(obj[key][sub])}\n`;
+            }
+        } else {
+            out += `${key}: ${obj[key]}\n`;
+        }
+    }
+    return out;
+}
+
+// SEARCH FUNCTION
+function search() {
+    let brand = brandSelect.value;
+    let model = modelSelect.value;
+
+    if (!brand || !model) return;
+
+    let data = mobiles[brand][model];
+
+    resultBox.style.display = "block";
+    resultBox.innerHTML = `
+        <h3>${model.toUpperCase()}</h3>
+        <pre>${convertToText(data)}</pre>
+    `;
+}
