@@ -39,7 +39,7 @@ console.log(user);
 
 
 
-let num = 10;
+let num1= 10;
 
 let num = 20;
 
