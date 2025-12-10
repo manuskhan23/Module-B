@@ -1,86 +1,98 @@
-// var IsStatus
-
 // advance js, es6
-
+    
 // var
-
+ 
 // let const
 
-// var names = "faraz";
+var names = "faraz";
 
-// {
-//   var names = "ahmed";
-// }
+{
+  var names = "ahmed";
+}
 
-// console.log(names);
+console.log(names);
 
-// function greet() {
-//   const abc = "hello user";
-// }
 
-// console.log(abc);
 
-// let number = 100;
-// number = 50;
+function greet() {
+  const abc = "hello user";
+}
 
-// console.log(number);
+console.log(abc);
 
-// const user = {
-//   name: "faraz",
-//   email: "faraz@gmail.com",
-//   age: 25,
-// };
-// user = 20;
 
-// console.log(user);
 
-// let num = 10;
+let number = 100;
+number = 50;
 
-// let num = 20;
+console.log(number);
 
-// console.log(num);
+
+const user = {
+  name: "faraz",
+  email: "faraz@gmail.com",
+  age: 25,
+};
+user = 20;
+
+console.log(user);
+
+
+
+let num = 10;
+
+let num = 20;
+
+console.log(num);
+
 
 // hoisted
 
-// console.log(IsStatus);
 
-// var IsStatus = false;
+console.log(IsStatus);
+
+var IsStatus = false;
+
 
 // template literals
 
-// let name = "faraz";
+let name = "faraz";
 
-// let age = 25;
+let age = 25;
 
 // console.log("Hello My name is ", name, "and I am", age, "years old");
 
-// console.log(`Hello My name is ${name} and I am ${age} years old`);
+console.log(`Hello My name is ${name} and I am ${age} years old`);
+
 
 // ternary operator
 
-// let city = "lahore";
+let city = "lahore";
 
-// city === "karachi" ? console.log("allow") : console.log("not allow");
+city === "karachi" ? console.log("allow") : console.log("not allow");
 
-// let percentage = 105;
 
-// let check =
-//   percentage >= 80 && percentage <= 100
-//     ? "A+"
-//     : percentage >= 70 && percentage <= 80
-//     ? "A Grade"
-//     : percentage >= 60 && percentage <= 70
-//     ? "B Grade"
-//     : percentage >= 50 && percentage <= 60
-//     ? "C Grade"
-//     : percentage >= 40 && percentage <= 50
-//     ? "D Grade"
-//     : "invalid input";
+let percentage = 105;
 
-// console.log(check);
+let check =
+  percentage >= 80 && percentage <= 100
+    ? "A+"
+    : percentage >= 70 && percentage <= 80
+    ? "A Grade"
+    : percentage >= 60 && percentage <= 70
+    ? "B Grade"
+    : percentage >= 50 && percentage <= 60
+    ? "C Grade"
+    : percentage >= 40 && percentage <= 50
+    ? "D Grade"
+    : "invalid input";
+
+console.log(check);
+
 
 // if (city === "lahore") {
 //   console.log("allow");
+
 
 let obj = {
   id: 1,
@@ -100,10 +112,6 @@ obj.id = 100;
 console.log(obj);
 
 console.log(Object.entries(obj));
-
-
-
-
 
 
 const mobiles = {
@@ -366,4 +374,5 @@ const mobiles = {
             expandableStorage: true
         }
     }
-};
+
+}; 
