@@ -200,30 +200,3 @@ main()
 //     console.log("task 2")
  
 // })
-
-
-//--------------------------------
-// github user finder
-//--------------------------------
-
-
-let no = prompt("Enter a github username");
-
-    let outerData;
-
-    let getData2 = async () => {
-      let response = await fetch(`https://api.github.com/users/${no}`);
-      let y = await response.json();
-      outerData = y;
-    };
-
-    let mainAsync2 = async () => {
-      await getData2();
-
-      document.getElementById("e").innerHTML = `
-        <img src="${outerData.avatar_url}" style="width: 200px; height: 200px; border-radius: 50%;" alt="GitHub Avatar">
-        <ul>
-      `;
-    };
-
-    mainAsync2();
