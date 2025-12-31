@@ -1,0 +1,10 @@
+.dd{
+  background-color: black;
+  color: red;
+  display: flex;
+  gap: 20px;
+}
+img{
+  display: block;
+  text-align: center;
+}
