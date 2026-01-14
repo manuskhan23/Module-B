@@ -1,0 +1,105 @@
+/* Page background */
+.page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1e293b, #020617);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card */
+.card {
+  width: 420px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Headings */
+.form h2 {
+  color: white;
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #94a3b8;
+  margin-bottom: 30px;
+}
+
+/* Inputs */
+.inputGroup {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 14px 12px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 10px;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+.inputGroup input:focus {
+  border-color: #6366f1;
+}
+
+.inputGroup label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+  transition: .3s;
+  background: #020617;
+  padding: 0 6px;
+}
+
+.inputGroup input:focus + label,
+.inputGroup input:not(:placeholder-shown) + label {
+  top: -9px;
+  font-size: 12px;
+  color: #818cf8;
+}
+
+/* Button */
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg,#6366f1,#8b5cf6);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: .3s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(99,102,241,.5);
+}
+
+/* Switch text */
+.switch {
+  margin-top: 22px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.switch span {
+  color: #818cf8;
+  cursor: pointer;
+  font-weight: 500;
+}
