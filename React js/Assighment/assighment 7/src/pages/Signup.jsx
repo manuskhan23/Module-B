@@ -1,89 +1,74 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import Input from "../components/Input";
-import styles from "../styles/Login-Signup.module.css";
+import React from 'react';
+import './SignUp.css';
+import LOGO_IMG from './dd.png';
+import PRIVACY_ICON from './we.png'; 
+import { Link } from 'react-router-dom';
 
-function Signup() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const navigate = useNavigate();
-
-  const handleSignup = (e) => {
-    e.preventDefault();
-    if (firstName && lastName && email && password && confirmPassword) {
-      if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-      }
-      alert("Account created successfully!");
-      navigate("/login");
-    } else {
-      alert("Please fill in all fields");
-    }
-  };
-
+const SignUp = () => {
   return (
-    <div className={styles.login}>
-      <div>
-        <h1>Create Account</h1>
-        <p>Join Apple and explore amazing products</p>
+    <div className="apple-signup-page">
+      <header className="icloud-header">
+        <i className="fa-brands fa-apple"></i>
+        <span>iCloud</span>
+      </header>
 
-        <form onSubmit={handleSignup}>
-          <Input
-            labels="First Name"
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="John"
-          />
+      <main className="signup-content">
+        <div className="signup-card">
+          <div className="signup-inner">
+            {/* Round Logo at the top */}
+            <div className="signup-logo-container">
+               <img src={LOGO_IMG} alt="" className="signup-main-logo" />
+            </div>
 
-          <Input
-            labels="Last Name"
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Doe"
-          />
+            <h1 className="signup-title">Create Your Apple Account</h1>
+            <p className="signup-subtitle">One account is all you need to access all Apple services.</p>
+            <div className="signup-form-grid">
+              <div className="input-row">
+                <input type="text" placeholder="First Name" className="signup-input" />
+                <input type="text" placeholder="Last Name" className="signup-input" />
+              </div>
 
-          <Input
-            labels="Email Address"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-          />
+              <div className="section-label">COUNTRY / REGION</div>
+              <select className="signup-select">
+                <option>United States</option>
+                <option>Pakistan</option>
+                <option>United Kingdom</option>
+              </select>
 
-          <Input
-            labels="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-          />
+              <input type="date" className="signup-input full-width" />
+              
+              <div className="separator"></div>
 
-          <Input
-            labels="Confirm Password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••"
-          />
+              <input type="email" placeholder="name@example.com" className="signup-input full-width" />
+              
+              <div className="input-row">
+                <input type="password" placeholder="Password" className="signup-input" />
+                <input type="password" placeholder="Confirm Password" className="signup-input" />
+              </div>
+            </div>
 
-          <button type="submit">Create Account</button>
-        </form>
+            <div className="signup-privacy">
+              <img src={PRIVACY_ICON} alt="" className="privacy-icon-small" />
+              <p>
+                Your Apple Account information is used to allow you to sign in securely and access your data. 
+                <a href="#" className="apple-link"> See how your data is managed...</a>
+              </p>
+            </div>
 
-        <p style={{ textAlign: "center", marginTop: "20px", color: "#64748b", fontSize: "14px" }}>
-          Already have an account?{" "}
-          <Link to="/login" style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "600" }}>
-            Sign in
-          </Link>
-        </p>
-      </div>
+            <div className="signup-actions">
+              <button className="btn-signup-continue">Continue</button>
+            </div>
+
+            {/* Link for users who already have an account */}
+            <div className="existing-account-link">
+              <span>Already have an Apple Account? </span>
+              <Link to="/Login" className="apple-link">Sign in here</Link>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
-}
+};
 
-export default Signup;
+export default SignUp;

@@ -1,58 +1,61 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import Input from "../components/Input";
-import styles from "../styles/Login-Signup.module.css";
+import React from 'react';
+import './Login.css';
+import logo from './dd.png'
+import fjj from './we.png'
+import { Link } from "react-router-dom";
 
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (email && password) {
-      alert("Login successful!");
-      navigate("/");
-    } else {
-      alert("Please fill in all fields");
-    }
-  };
-
+const Login = () => {
   return (
-    <div className={styles.login}>
-      <div>
-        <h1>Welcome Back</h1>
-        <p>Sign in to your Apple account</p>
+    <div className="apple-login-container">
+      {/* Top Left Branding */}
+      <header className="icloud-branding">
+        <i className="fa-brands fa-apple"></i>
+        <span>iCloud</span>
+      </header>
 
-        <form onSubmit={handleLogin}>
-          <Input
-            labels="Email Address"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-          />
+      <main className="login-content">
+        <div className="login-card-bg">
+          <div className="login-card-inner">
+            {/* Round Gradient Logo */}
+            <div className="logo-box">
+              <img src={logo} alt="Apple Account" className="apple-acc-logo" />
+            </div>
 
-          <Input
-            labels="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-          />
+            <h1 className="login-heading">Sign in with Apple Account</h1>
 
-          <button type="submit">Sign In</button>
-        </form>
+            <div className="login-form">
+              <input 
+                type="text" 
+                placeholder="Email or Phone Number" 
+                className="apple-input-field" 
+              />
+              <Link to="/SignUp" className="apple-blue-link">Create Your Apple Account</Link>
+            </div>
 
-        <p style={{ textAlign: "center", marginTop: "20px", color: "#64748b", fontSize: "14px" }}>
-          Don't have an account?{" "}
-          <Link to="/signup" style={{ color: "#3b82f6", textDecoration: "none", fontWeight: "600" }}>
-            Sign up
-          </Link>
-        </p>
-      </div>
+            {/* Privacy Section */}
+            <div className="privacy-block">
+              <img src={fjj} alt="Privacy" className="privacy-symbol" />
+              <p className="privacy-text">
+                Your Apple Account information is used to allow you to sign in securely and access your data. 
+                <a href="#"> See how your data is managed...</a>
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="action-row">
+              <button className="btn-apple-continue">Continue</button>
+              <button className="btn-apple-iphone">
+                <i className="fa-solid fa-user-group"></i>
+                Sign in with iPhone
+              </button>
+            </div>
+
+            <p className="os-requirement">Requires a device with iOS 17 or later.</p>
+          </div>
+        </div>
+      </main>
     </div>
   );
-}
+};
 
 export default Login;
