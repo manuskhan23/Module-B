@@ -1,0 +1,53 @@
+.hoverrr:hover {
+  color: #fff !important;
+  background-color: #0071e3 !important;
+  transition: all 0.3s ease !important;
+}
+.hoper:hover{
+    color: #fff !important;
+  background-color: #0071e3 !important;
+  transition: all 0.3s ease !important;
+}
+.hoverrr{
+    width: 87.14px !important;
+    height: 52px !important;
+}
+.hoverrr{
+    width: 87.14px !important;
+    height: 52px !important;
+}
+
+.bg123{
+    background-image: url("https://www.apple.com/v/home/ck/images/promos/apple-fitness-plus-ny/promo_apple_fitness_plus_ny__di8hyqkgekya_large.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.bg125{
+    background-image: url("https://www.apple.com/v/home/ck/images/promos/airpods-pro-3/promo_airpodspro_3__f6xmza7bglei_large.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+.d{
+    height:'52px' !important;
+    width:'100px' !important
+}
+.d:hover {
+  color: #fff !important;
+  background-color: #0071e3 !important;
+  transition: all 0.3s ease !important;
+}
+.bg1250{
+    background-image: url("https://www.apple.com/v/home/ck/images/promos/iphone-tradein/promo_iphone_tradein__bugw15ka691e_large.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+.bg1230{
+    background-image: url("https://www.apple.com/v/home/ck/images/promos/apple-card/promo_apple_card__5cm7draujpey_large.jpg") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}

@@ -1,0 +1,69 @@
+.hero2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 6px;
+}
+
+/* CARD BASE */
+.hero2-card {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+/* THEMES */
+.hero2-card.dark {
+  background-color: #000;
+  color: #fff;
+}
+
+.hero2-card.light {
+  background-color: #f5f5f7;
+  color: #000;
+}
+
+/* CONTENT */
+.hero2-content {
+  position: absolute;
+  top: 32px;
+  text-align: center;
+  z-index: 2;
+}
+
+.hero2-content h2 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.hero2-content p {
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+/* BUTTONS */
+.hero2-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* IMAGE */
+.hero2-image {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.hero2-image img {
+  max-height: 90%;
+  max-width: 90%;
+  object-fit: contain;
+}
