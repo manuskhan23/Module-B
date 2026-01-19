@@ -4,7 +4,7 @@ import HeroSection1 from '../components/HeroSection1'
 import HeroSection2 from '../components/HeroSection2'
 import './card.css'
 import Slider from '../components/Slider'
-import Slider2 from '../components/slider2'
+import Slider2 from '../components/Slider2'
 import big1 from '../components/imgs/big1.png'
 import big2 from '../components/imgs/big2.png'
 import big3 from '../components/imgs/big3.png'
@@ -156,7 +156,6 @@ function Home() {
       bigImgData={bigScreenshots} 
       smallImgData={smallScreenshots} 
     />
-    <br />
     <Slider2 title="More from Apple." imgData={sl2img} />
     <Footer/>
     </div>
