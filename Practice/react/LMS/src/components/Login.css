@@ -1,0 +1,303 @@
+.login-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+.login-left {
+  width: 65% !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 40px !important;
+  margin: 0 !important;
+}
+
+.logo-icon {
+  font-size: 3.5rem !important;
+  color: white !important;
+  margin-bottom: 20px !important;
+  display: block !important;
+}
+
+.brand-title {
+  color: white !important;
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  margin: 0 0 12px 0 !important;
+  text-align: center !important;
+  line-height: normal !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+}
+
+.brand-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1.1rem !important;
+  text-align: center !important;
+  margin: 0 !important;
+  line-height: normal !important;
+}
+
+.login-right {
+  width: 35% !important;
+  background: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 30px !important;
+  margin: 0 !important;
+}
+
+.login-card {
+  width: 100% !important;
+  max-width: 300px !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.login-card .card-body {
+  padding: 24px !important;
+  margin: 0 !important;
+}
+
+.login-card h4 {
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  font-size: 1.4rem !important;
+  margin: 0 0 20px 0 !important;
+  text-align: center !important;
+  line-height: normal !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.form-group {
+  margin-bottom: 16px !important;
+  padding: 0 !important;
+}
+
+.form-label {
+  color: #495057 !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 6px !important;
+  display: block !important;
+  padding: 0 !important;
+}
+
+.input-with-icon {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.input-icon {
+  position: absolute !important;
+  left: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #6c757d !important;
+  font-size: 14px !important;
+  z-index: 10 !important;
+  margin: 0 !important;
+}
+
+.form-control {
+  width: 100% !important;
+  padding: 10px 12px 10px 32px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  background: white !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+select.form-control {
+  appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+  background-size: 16px !important;
+  padding-right: 32px !important;
+}
+
+.form-control:focus {
+  outline: none !important;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+.password-input-group {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.password-input-group .form-control {
+  padding-right: 40px !important;
+}
+
+.password-toggle {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  color: #6c757d !important;
+  cursor: pointer !important;
+  padding: 4px !important;
+  font-size: 14px !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+}
+
+.password-toggle:hover {
+  color: #495057 !important;
+}
+
+.btn-primary {
+  width: 100% !important;
+  padding: 10px 16px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  margin-bottom: 12px !important;
+  display: block !important;
+}
+
+.btn-primary:hover {
+  opacity: 0.9 !important;
+}
+
+.btn-primary:disabled {
+  background: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+.alert {
+  border-radius: 6px !important;
+  border: none !important;
+  margin-bottom: 16px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+}
+
+.alert-danger {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+}
+
+.alert-success {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+}
+
+.link-button {
+  background: none !important;
+  border: none !important;
+  color: #667eea !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+}
+
+.link-button:hover {
+  color: #764ba2 !important;
+}
+
+.help-text {
+  color: #6c757d !important;
+  font-size: 0.8rem !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: normal !important;
+}
+
+.login-container * {
+  box-sizing: border-box !important;
+}
+
+.login-card * {
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 992px) {
+  .login-container {
+    flex-direction: column !important;
+  }
+  
+  .login-left {
+    width: 100% !important;
+    height: 35vh !important;
+    padding: 25px 20px !important;
+  }
+  
+  .login-right {
+    width: 100% !important;
+    height: 65vh !important;
+    padding: 25px 20px !important;
+  }
+  
+  .brand-title {
+    font-size: 1.8rem !important;
+  }
+  
+  .logo-icon {
+    font-size: 2.8rem !important;
+    margin-bottom: 15px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-left {
+    padding: 20px 15px !important;
+  }
+  
+  .login-right {
+    padding: 20px 15px !important;
+  }
+  
+  .login-card .card-body {
+    padding: 20px 16px !important;
+  }
+  
+  .login-card {
+    max-width: 280px !important;
+  }
+  
+  .brand-title {
+    font-size: 1.6rem !important;
+  }
+  
+  .logo-icon {
+    font-size: 2.5rem !important;
+    margin-bottom: 12px !important;
+  }
+}
