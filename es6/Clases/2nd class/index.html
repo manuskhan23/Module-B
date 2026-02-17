@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container-fluid h-100">
+      <h1 class="text-center mb-5">Mobile Filtering App</h1>
+
+      <select
+        onchange="searchModel()"
+        id="brand"
+        class="w-25 mb-3 form-control"
+      >
+        <option value="">Select Brand</option>
+      </select>
+      <select id="model" class="w-25 mb-3 form-control">
+        <option value="">Select Model</option>
+      </select>
+
+      <input
+        onclick="getData()"
+        class="btn btn-info"
+        type="submit"
+        value="submit"
+      />
+    </div>
+
+    <div id="display-result"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+.s2-root {
+  width: 100%;
+  background: #000;
+  padding: 40px 0;
+  overflow: hidden;
+}
+
+.s2-title {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+/* This container ensures the image FITS the screen */
+.s2-main-wrapper {
+  width: 85%; /* Adjust this (80%-90%) to control image size */
+  max-width: 1200px; /* Limits how big it gets on giant monitors */
+  margin: 0 auto;
+  position: relative;
+}
+
+.s2-viewport {
+  width: 100%;
+  overflow: visible; /* Allows neighbors to peek */
+  /* Keeps the image height proportional and prevents 'Big Image' issues */
+  aspect-ratio: 16 / 9; 
+}
+
+.s2-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.s2-slide {
+  flex: 0 0 100%;
+  padding: 0 10px;
+  height: 100%;
+}
+
+.s2-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image fills the box without stretching */
+  border-radius: 12px;
+  display: block;
+}
+
+/* --- DOTS SYSTEM --- */
+.s2-dots-window {
+  width: 110px;
+  margin: 30px auto 0;
+  overflow: hidden;
+}
+
+.s2-dots-track {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.5s ease;
+}
+
+.s2-dot {
+  flex: 0 0 8px;
+  height: 8px;
+  background-color: #444;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.s2-dot.pill {
+  flex: 0 0 45px;
+  background-color: #888;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.s2-dot.mini {
+  transform: scale(0.6);
+  opacity: 0.3;
+}
+
+.s2-fill {
+  height: 100%;
+  background: #fff;
+  width: 0%;
+  animation: s2Progress 5s linear forwards;
+}
+
+@keyframes s2Progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
