@@ -1,70 +1,112 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from './styles/theme';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import store from './store/store';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute, AuthRoute } from './routes/Routes';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-// Pages
-import Login from './pages/Login/Login';
-import Signup from './pages/Login/Signup';
-import DashboardLayout from './pages/Dashboard/DashboardLayout';
-import DashboardHome from './pages/Dashboard/DashboardHome';
-import StudentList from './pages/Students/StudentList';
-import StudentAdd from './pages/Students/StudentAdd';
-
-// Placeholder components for other pages
-const Placeholder = ({ title }) => <div>{title} Page (Coming Soon)</div>;
+import { ProtectedRoute } from './routes/ProtectedRoute';
+import { Layout } from './layouts/Layout';
+import { AuthPage } from './pages/AuthPage';
+import { Dashboard } from './pages/Dashboard';
+import { StudentList } from './pages/students/StudentList';
+import { StudentForm } from './pages/students/StudentForm';
+import { TeacherList } from './pages/teachers/TeacherList';
+import { TeacherForm } from './pages/teachers/TeacherForm';
+import { ClassList } from './pages/classes/ClassList';
+import { ClassForm } from './pages/classes/ClassForm';
+import { SubjectList } from './pages/subjects/SubjectList';
+import { SubjectForm } from './pages/subjects/SubjectForm';
+import { FeeStructure } from './pages/fees/FeeStructure';
+import { FeeSubmission } from './pages/fees/FeeSubmission';
+import { FeeVoucher } from './pages/fees/FeeVoucher';
+import { ExamSchedule } from './pages/exams/ExamSchedule';
+import { ExamResult } from './pages/exams/ExamResult';
+import { SyllabusList } from './pages/syllabus/SyllabusList';
+import { SyllabusForm } from './pages/syllabus/SyllabusForm';
+import { AdmissionForm } from './pages/admission/AdmissionForm';
+import { SchoolRegistration } from './pages/school/SchoolRegistration';
+import './styles/index.css';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <Router>
+    <Provider store={store}>
+      <BrowserRouter>
+        <AuthProvider>
           <Routes>
-            <Route path="/login" element={
-              <AuthRoute>
-                <Login />
-              </AuthRoute>
-            } />
-            <Route path="/signup" element={
-              <AuthRoute>
-                <Signup />
-              </AuthRoute>
-            } />
-
-            <Route path="/" element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardHome />} />
-
-              {/* Students */}
-              <Route path="students/list" element={<StudentList />} />
-              <Route path="students/add" element={<StudentAdd />} />
-              <Route path="students/transfer" element={<Placeholder title="Transfer Student" />} />
-
-              {/* Teachers */}
-              <Route path="teachers/list" element={<Placeholder title="Teacher List" />} />
-              <Route path="teachers/add" element={<Placeholder title="Add Teacher" />} />
-              <Route path="teachers/allocation" element={<Placeholder title="Teacher Allocation" />} />
-
-              {/* Subjects */}
-              <Route path="subjects/list" element={<Placeholder title="Subject List" />} />
-              <Route path="subjects/add" element={<Placeholder title="Add Subject" />} />
-
-              {/* Others */}
-              <Route path="*" element={<Placeholder title="Not Found" />} />
-            </Route>
+            <Route path="/auth" element={<AuthPage />} />
+            
+            {/* Protected Routes with Layout */}
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Routes>
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      
+                      {/* Students */}
+                      <Route path="/students" element={<StudentList />} />
+                      <Route path="/students/add" element={<StudentForm />} />
+                      <Route path="/students/edit/:id" element={<StudentForm />} />
+                      
+                      {/* Teachers */}
+                      <Route path="/teachers" element={<TeacherList />} />
+                      <Route path="/teachers/add" element={<TeacherForm />} />
+                      <Route path="/teachers/edit/:id" element={<TeacherForm />} />
+                      
+                      {/* Classes */}
+                      <Route path="/classes" element={<ClassList />} />
+                      <Route path="/classes/add" element={<ClassForm />} />
+                      <Route path="/classes/edit/:id" element={<ClassForm />} />
+                      
+                      {/* Subjects */}
+                      <Route path="/subjects" element={<SubjectList />} />
+                      <Route path="/subjects/add" element={<SubjectForm />} />
+                      <Route path="/subjects/edit/:id" element={<SubjectForm />} />
+                      
+                      {/* Fees */}
+                      <Route path="/fees" element={<FeeStructure />} />
+                      <Route path="/fees/submission" element={<FeeSubmission />} />
+                      <Route path="/fees/voucher" element={<FeeVoucher />} />
+                      
+                      {/* Exams */}
+                      <Route path="/exams" element={<ExamSchedule />} />
+                      <Route path="/exams/results" element={<ExamResult />} />
+                      
+                      {/* Syllabus */}
+                      <Route path="/syllabus" element={<SyllabusList />} />
+                      <Route path="/syllabus/add" element={<SyllabusForm />} />
+                      <Route path="/syllabus/edit/:id" element={<SyllabusForm />} />
+                      
+                      {/* Admission */}
+                      <Route path="/admission" element={<AdmissionForm />} />
+                      
+                      {/* School */}
+                      <Route path="/school" element={<SchoolRegistration />} />
+                      
+                      {/* Default */}
+                      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                    </Routes>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
           </Routes>
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+        </AuthProvider>
+      </BrowserRouter>
+    </Provider>
   );
 }
 

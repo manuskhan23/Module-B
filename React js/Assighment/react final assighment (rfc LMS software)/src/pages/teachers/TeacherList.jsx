@@ -5,37 +5,36 @@ import { FiPlus } from 'react-icons/fi';
 import { PageHeader } from '../../components/PageHeader';
 import { DataGrid } from '../../components/DataGrid';
 import { Button } from '../../components/Button';
-import { setStudents, setLoading } from '../../store/slices/studentSlice';
+import { setTeachers, setLoading } from '../../store/slices/teacherSlice';
 import '../../styles/pages.css';
 
-export const StudentList = () => {
+export const TeacherList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { students, loading } = useSelector(state => state.student);
+  const { teachers, loading } = useSelector(state => state.teacher);
 
   useEffect(() => {
-    fetchStudents();
+    fetchTeachers();
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchTeachers = async () => {
     dispatch(setLoading(true));
     try {
-      // Mock data - replace with API call
       const mockData = [
-        { id: 1, name: 'John Doe', rollNo: 'STU001', email: 'john@example.com', class: '10-A', status: 'Active' },
-        { id: 2, name: 'Jane Smith', rollNo: 'STU002', email: 'jane@example.com', class: '10-B', status: 'Active' },
+        { id: 1, name: 'Mr. Smith', email: 'smith@example.com', subject: 'Mathematics', phone: '9876543210', status: 'Active' },
+        { id: 2, name: 'Ms. Johnson', email: 'johnson@example.com', subject: 'English', phone: '9876543211', status: 'Active' },
       ];
-      dispatch(setStudents(mockData));
+      dispatch(setTeachers(mockData));
     } finally {
       dispatch(setLoading(false));
     }
   };
 
   const columns = [
-    { field: 'rollNo', headerName: 'Roll No' },
     { field: 'name', headerName: 'Name' },
     { field: 'email', headerName: 'Email' },
-    { field: 'class', headerName: 'Class' },
+    { field: 'subject', headerName: 'Subject' },
+    { field: 'phone', headerName: 'Phone' },
     { 
       field: 'status', 
       headerName: 'Status',
@@ -46,23 +45,23 @@ export const StudentList = () => {
   return (
     <div className="page">
       <PageHeader 
-        title="Students"
-        subtitle="Manage all students"
+        title="Teachers"
+        subtitle="Manage all teachers"
         actions={
           <Button 
             variant="primary" 
-            onClick={() => navigate('/students/add')}
+            onClick={() => navigate('/teachers/add')}
           >
-            <FiPlus /> Add Student
+            <FiPlus /> Add Teacher
           </Button>
         }
       />
       <div className="page-content">
         <DataGrid 
           columns={columns} 
-          rows={students}
+          rows={teachers}
           loading={loading}
-          onEdit={(student) => navigate(`/students/edit/${student.id}`)}
+          onEdit={(teacher) => navigate(`/teachers/edit/${teacher.id}`)}
           onDelete={(id) => console.log('Delete:', id)}
         />
       </div>
