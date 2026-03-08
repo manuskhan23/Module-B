@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -8,76 +8,120 @@ import { Select } from '../../components/Select';
 import { Button } from '../../components/Button';
 import { DataGrid } from '../../components/DataGrid';
 import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, addDoc, query, getDocs, deleteDoc, doc, orderBy, serverTimestamp, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 const schema = yup.object().shape({
   studentId: yup.string().required('Student is required'),
   examId: yup.string().required('Exam is required'),
-  marksObtained: yup.number().required('Marks is required').min(0).max(100),
+  marksObtained: yup.number().typeError('Marks must be a number').required('Marks is required').min(0).max(100),
+  totalMarks: yup.number().typeError('Total marks must be a number').required('Total marks is required').min(1),
   grade: yup.string().required('Grade is required'),
 });
 
 export const ExamResult = () => {
-  const [results, setResults] = useState([
-    { id: 1, student: 'John Doe', exam: 'Mathematics', marks: 85, grade: 'A+', status: 'Published' },
-    { id: 2, student: 'Jane Smith', exam: 'English', marks: 78, grade: 'A', status: 'Published' },
-  ]);
+  const { user } = useAuth();
+  const [results, setResults] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data) => {
+  useEffect(() => {
+    if (user) fetchData();
+  }, [user]);
+
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const newResult = {
-        id: results.length + 1,
-        student: data.studentId,
-        exam: data.examId,
-        marks: data.marksObtained,
-        grade: data.grade,
-        status: 'Published',
-      };
-      setResults([...results, newResult]);
-      toast.success('Result added successfully!');
-      reset();
+      const [studentSnap, examSnap, resultSnap] = await Promise.all([
+        getDocs(query(collection(db, 'students'), where('userId', '==', user.uid))),
+        getDocs(query(collection(db, 'exams'), where('userId', '==', user.uid))),
+        getDocs(query(collection(db, 'results'), where('userId', '==', user.uid)))
+      ]);
+
+      setStudents(studentSnap.docs.map(doc => ({ value: doc.id, label: doc.data().name })));
+      setExams(examSnap.docs.map(doc => ({ value: doc.id, label: doc.data().examName })));
+      setResults(resultSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0)));
     } catch (error) {
-      toast.error('Failed to add result');
+      toast.error('Error fetching data: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setSubmitting(true);
+    try {
+      const studentName = students.find(s => s.value === data.studentId)?.label || '';
+      const examName = exams.find(e => e.value === data.examId)?.label || '';
+      const percentage = (data.marksObtained / data.totalMarks) * 100;
+
+      await addDoc(collection(db, 'results'), {
+        ...data,
+        userId: user.uid,
+        studentName,
+        examName,
+        percentage: percentage.toFixed(2),
+        createdAt: serverTimestamp(),
+      });
+
+      toast.success('Result published successfully!');
+      reset();
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to publish result: ' + error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this result?')) {
+      try {
+        await deleteDoc(doc(db, 'results', id));
+        toast.success('Result deleted successfully');
+        fetchData();
+      } catch (error) {
+        toast.error('Failed to delete result');
+      }
     }
   };
 
   const columns = [
-    { field: 'student', headerName: 'Student' },
-    { field: 'exam', headerName: 'Exam' },
-    { field: 'marks', headerName: 'Marks', render: (val) => `${val}/100` },
+    { field: 'studentName', headerName: 'Student' },
+    { field: 'examName', headerName: 'Exam' },
+    { field: 'marksObtained', headerName: 'Marks', render: (val, row) => `${val}/${row.totalMarks}` },
+    { field: 'percentage', headerName: 'Percentage', render: (val) => `${val}%` },
     { field: 'grade', headerName: 'Grade' },
-    { field: 'status', headerName: 'Status', render: (status) => <span className={`badge badge-${status.toLowerCase()}`}>{status}</span> },
   ];
 
   return (
     <div className="page">
-      <PageHeader title="Exam Results" subtitle="Record and publish exam results" />
+      <PageHeader title="Exam Results" subtitle="Manage and publish student performance" />
       <div className="page-content">
-        <div style={{ background: 'white', padding: '24px', borderRadius: '8px', marginBottom: '24px', border: '1px solid #E5E7EB' }}>
-          <h3 style={{ marginBottom: '20px' }}>Add Exam Result</h3>
+        <div className="form-container-card">
+          <h3 className="section-title">Record Exam Result</h3>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-grid">
               <Select
                 label="Student"
                 {...register('studentId')}
-                options={[
-                  { value: 'john', label: 'John Doe' },
-                  { value: 'jane', label: 'Jane Smith' },
-                ]}
+                options={students}
                 error={errors.studentId?.message}
                 required
               />
               <Select
                 label="Exam"
                 {...register('examId')}
-                options={[
-                  { value: 'math', label: 'Mathematics' },
-                  { value: 'eng', label: 'English' },
-                  { value: 'sci', label: 'Science' },
-                ]}
+                options={exams}
                 error={errors.examId?.message}
                 required
               />
@@ -88,6 +132,14 @@ export const ExamResult = () => {
                 error={errors.marksObtained?.message}
                 required
               />
+              <Input
+                label="Total Marks"
+                type="number"
+                {...register('totalMarks')}
+                defaultValue={100}
+                error={errors.totalMarks?.message}
+                required
+              />
               <Select
                 label="Grade"
                 {...register('grade')}
@@ -96,19 +148,30 @@ export const ExamResult = () => {
                   { value: 'A', label: 'A' },
                   { value: 'B', label: 'B' },
                   { value: 'C', label: 'C' },
+                  { value: 'D', label: 'D' },
+                  { value: 'F', label: 'F' },
                 ]}
                 error={errors.grade?.message}
                 required
               />
             </div>
             <div className="form-actions">
-              <Button type="submit" variant="primary">Add Result</Button>
+              <Button type="submit" variant="primary" disabled={submitting}>
+                {submitting ? 'Publishing...' : 'Publish Result'}
+              </Button>
             </div>
           </form>
         </div>
 
-        <h3 style={{ marginBottom: '16px' }}>Recent Results</h3>
-        <DataGrid columns={columns} rows={results} />
+        <div className="list-container-card">
+          <h3 className="section-title">Result List</h3>
+          <DataGrid
+            columns={columns}
+            rows={results}
+            loading={loading}
+            onDelete={handleDelete}
+          />
+        </div>
       </div>
     </div>
   );

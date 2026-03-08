@@ -1,0 +1,237 @@
+.navbar {
+    height: 80px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    height: 60px;
+}
+
+.user-profile:hover,
+.user-profile.active {
+    background: #F3F4F6;
+}
+
+.profile-img-wrapper {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-profile-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+}
+
+.navbar-profile-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--background);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    border: 2px solid var(--primary);
+}
+
+.profile-chevron {
+    font-size: 16px;
+    color: #9CA3AF;
+    transition: transform 0.3s ease;
+}
+
+.profile-chevron.rotate {
+    transform: rotate(180deg);
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 240px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+    padding: 8px;
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    padding: 12px 16px;
+}
+
+.dropdown-user {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.dropdown-email {
+    font-size: 12px;
+    color: #6B7280;
+    margin: 4px 0 0 0;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px;
+}
+
+.dropdown-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #F3F4F6;
+    color: var(--primary);
+}
+
+.dropdown-item.logout {
+    color: #EF4444;
+}
+
+.dropdown-item.logout:hover {
+    background: #FEF2F2;
+    color: #DC2626;
+}
+
+.dropdown-icon {
+     font-size: 18px;
+ }
+
+ .mobile-menu-btn {
+     display: none;
+     background: none;
+     border: none;
+     font-size: 24px;
+     color: var(--primary);
+     cursor: pointer;
+     padding: 8px;
+     margin-right: 12px;
+     transition: all 0.3s ease;
+ }
+
+ .mobile-menu-btn:hover {
+     transform: scale(1.1);
+ }
+
+ .navbar-left {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     flex: 1;
+ }
+ 
+ @media (max-width: 768px) {
+     .mobile-menu-btn {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+     }
+
+     .user-info {
+         display: none;
+     }
+
+     .navbar {
+         padding: 0 16px;
+     }
+
+     .navbar-title {
+         font-size: 16px;
+     }
+
+     .user-profile {
+         height: 48px;
+         padding: 4px 12px;
+     }
+
+     .profile-img-wrapper {
+         width: 48px;
+         height: 48px;
+     }
+
+     .navbar-profile-img {
+         width: 48px;
+         height: 48px;
+     }
+
+     .navbar-profile-placeholder {
+         width: 48px;
+         height: 48px;
+         font-size: 20px;
+     }
+ }

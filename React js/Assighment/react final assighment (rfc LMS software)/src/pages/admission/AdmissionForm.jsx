@@ -1,53 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { PageHeader } from '../../components/PageHeader';
 import { Input } from '../../components/Input';
 import { Select } from '../../components/Select';
-import { DatePicker } from '../../components/DatePicker';
 import { Button } from '../../components/Button';
 import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 const schema = yup.object().shape({
-  name: yup.string().required('Name is required'),
+  firstName: yup.string().required('First name is required'),
+  lastName: yup.string().required('Last name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   phone: yup.string().required('Phone is required'),
   dateOfBirth: yup.string().required('DOB is required'),
-  class: yup.string().required('Class is required'),
-  parentName: yup.string().required('Parent name is required'),
-  parentPhone: yup.string().required('Parent phone is required'),
+  gender: yup.string().required('Gender is required'),
   address: yup.string().required('Address is required'),
+  previousSchool: yup.string().required('Previous school info is required'),
+  gradeApplyingFor: yup.string().required('Grade is required'),
+  parentName: yup.string().required('Parent/Guardian name is required'),
+  parentPhone: yup.string().required('Parent phone is required'),
 });
 
 export const AdmissionForm = () => {
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'classes'),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const classesList = querySnapshot.docs.map(doc => ({
+          value: doc.data().className,
+          label: doc.data().className
+        }));
+        setClasses(classesList);
+      } catch (error) {
+        toast.error('Error fetching classes');
+      }
+    };
+    fetchClasses();
+  }, [user]);
+
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      toast.success('Admission created successfully!');
+      await addDoc(collection(db, 'admissions'), {
+        ...data,
+        userId: user.uid,
+        status: 'Pending',
+        appliedAt: serverTimestamp(),
+      });
+      toast.success('Admission application submitted successfully!');
+      navigate('/dashboard');
     } catch (error) {
-      toast.error('Failed to create admission');
+      toast.error('Failed to submit application: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Create Admission"
-        subtitle="Register a new student admission"
+      <PageHeader
+        title="Admission Form"
+        subtitle="Apply for new student admission"
+        onBack={() => navigate('/dashboard')}
       />
       <div className="page-content">
         <form onSubmit={handleSubmit(onSubmit)} className="form">
-          <h3 style={{ marginBottom: '20px' }}>Student Information</h3>
           <div className="form-grid">
             <Input
-              label="Full Name"
-              {...register('name')}
-              error={errors.name?.message}
+              label="First Name"
+              {...register('firstName')}
+              error={errors.firstName?.message}
+              required
+            />
+            <Input
+              label="Last Name"
+              {...register('lastName')}
+              error={errors.lastName?.message}
               required
             />
             <Input
@@ -64,22 +111,47 @@ export const AdmissionForm = () => {
               error={errors.phone?.message}
               required
             />
-            <DatePicker
+            <Input
               label="Date of Birth"
-              value=""
-              onChange={(val) => setValue('dateOfBirth', val)}
+              type="date"
+              {...register('dateOfBirth')}
               error={errors.dateOfBirth?.message}
               required
             />
             <Select
-              label="Class"
-              {...register('class')}
+              label="Gender"
+              {...register('gender')}
               options={[
-                { value: '10-A', label: '10-A' },
-                { value: '10-B', label: '10-B' },
-                { value: '12-A', label: '12-A' },
+                { value: 'male', label: 'Male' },
+                { value: 'female', label: 'Female' },
+                { value: 'other', label: 'Other' },
               ]}
-              error={errors.class?.message}
+              error={errors.gender?.message}
+              required
+            />
+            <Select
+              label="Grade Applying For"
+              {...register('gradeApplyingFor')}
+              options={classes}
+              error={errors.gradeApplyingFor?.message}
+              required
+            />
+            <Input
+              label="Parent Name"
+              {...register('parentName')}
+              error={errors.parentName?.message}
+              required
+            />
+            <Input
+              label="Parent Phone"
+              {...register('parentPhone')}
+              error={errors.parentPhone?.message}
+              required
+            />
+            <Input
+              label="Previous School"
+              {...register('previousSchool')}
+              error={errors.previousSchool?.message}
               required
             />
             <Input
@@ -89,27 +161,11 @@ export const AdmissionForm = () => {
               required
             />
           </div>
-
-          <h3 style={{ marginBottom: '20px', marginTop: '30px' }}>Parent/Guardian Information</h3>
-          <div className="form-grid">
-            <Input
-              label="Parent Name"
-              {...register('parentName')}
-              error={errors.parentName?.message}
-              required
-            />
-            <Input
-              label="Parent Phone"
-              type="tel"
-              {...register('parentPhone')}
-              error={errors.parentPhone?.message}
-              required
-            />
-          </div>
-
           <div className="form-actions">
-            <Button type="submit" variant="primary">Create Admission</Button>
-            <Button type="button" variant="secondary">Cancel</Button>
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Submitting...' : 'Submit Admission Application'}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => navigate('/dashboard')} disabled={loading}>Cancel</Button>
           </div>
         </form>
       </div>

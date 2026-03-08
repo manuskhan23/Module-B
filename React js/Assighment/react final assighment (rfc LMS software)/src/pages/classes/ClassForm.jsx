@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -8,35 +8,113 @@ import { Input } from '../../components/Input';
 import { Select } from '../../components/Select';
 import { Button } from '../../components/Button';
 import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 const schema = yup.object().shape({
-  name: yup.string().required('Class name is required'),
-  section: yup.string().required('Section is required'),
+  className: yup.string().required('Class name is required'),
+  gradeLevel: yup.string().required('Grade level is required'),
   classTeacher: yup.string().required('Class teacher is required'),
-  strength: yup.number().required('Strength is required').positive(),
+  schedule: yup.string().required('Schedule is required'),
+  roomNumber: yup.string().required('Room number is required'),
+  capacity: yup.number().typeError('Capacity must be a number').required('Capacity is required').positive(),
 });
 
 export const ClassForm = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [teachers, setTeachers] = useState([]);
+  const { user } = useAuth();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'teachers'),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const teachersList = querySnapshot.docs.map(doc => ({
+          value: doc.data().name,
+          label: doc.data().name
+        }));
+        setTeachers(teachersList);
+      } catch (error) {
+        toast.error('Error fetching teachers');
+      }
+    };
+
+    fetchTeachers();
+
+    if (id) {
+      const fetchClass = async () => {
+        try {
+          const docRef = doc(db, 'classes', id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            reset(docSnap.data());
+          }
+        } catch (error) {
+          toast.error('Error fetching class data');
+        }
+      };
+      fetchClass();
+    }
+  }, [id, reset]);
+
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      toast.success('Class created successfully!');
+      if (id) {
+        const docRef = doc(db, 'classes', id);
+        await updateDoc(docRef, {
+          ...data,
+          updatedAt: serverTimestamp(),
+        });
+        toast.success('Class updated successfully!');
+      } else {
+        // Check for duplicate class and grade level for THIS user
+        const q = query(
+          collection(db, 'classes'),
+          where('userId', '==', user.uid),
+          where('className', '==', data.className),
+          where('gradeLevel', '==', data.gradeLevel)
+        );
+        const duplicateCheck = await getDocs(q);
+
+        if (!duplicateCheck.empty) {
+          toast.error('This Class and Grade Level already exists!');
+          setLoading(false);
+          return;
+        }
+
+        await addDoc(collection(db, 'classes'), {
+          ...data,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+        });
+        toast.success('Class created successfully!');
+      }
       navigate('/classes');
     } catch (error) {
-      toast.error('Failed to create class');
+      toast.error('Failed to create class: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Create Class"
-        subtitle="Add a new class"
+      <PageHeader
+        title={id ? 'Edit Class' : 'Create Class'}
+        subtitle={id ? 'Modify class details' : 'Add a new class'}
         onBack={() => navigate('/classes')}
       />
       <div className="page-content">
@@ -44,39 +122,52 @@ export const ClassForm = () => {
           <div className="form-grid">
             <Input
               label="Class Name"
-              {...register('name')}
+              {...register('className')}
               placeholder="e.g., 10-A"
-              error={errors.name?.message}
+              error={errors.className?.message}
               required
             />
             <Input
-              label="Section"
-              {...register('section')}
-              placeholder="e.g., A"
-              error={errors.section?.message}
+              label="Grade Level"
+              {...register('gradeLevel')}
+              placeholder="e.g., Grade 10"
+              error={errors.gradeLevel?.message}
               required
             />
             <Select
               label="Class Teacher"
               {...register('classTeacher')}
-              options={[
-                { value: 'smith', label: 'Mr. Smith' },
-                { value: 'johnson', label: 'Ms. Johnson' },
-              ]}
+              options={teachers}
               error={errors.classTeacher?.message}
               required
             />
             <Input
-              label="Strength"
+              label="Schedule"
+              {...register('schedule')}
+              placeholder="e.g., Mon - Fri, 8:00 AM - 2:00 PM"
+              error={errors.schedule?.message}
+              required
+            />
+            <Input
+              label="Room Number"
+              {...register('roomNumber')}
+              placeholder="e.g., Room 101"
+              error={errors.roomNumber?.message}
+              required
+            />
+            <Input
+              label="Capacity"
               type="number"
-              {...register('strength')}
-              error={errors.strength?.message}
+              {...register('capacity')}
+              error={errors.capacity?.message}
               required
             />
           </div>
           <div className="form-actions">
-            <Button type="submit" variant="primary">Create Class</Button>
-            <Button type="button" variant="secondary" onClick={() => navigate('/classes')}>Cancel</Button>
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Saving...' : (id ? 'Update Class' : 'Create Class')}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => navigate('/classes')} disabled={loading}>Cancel</Button>
           </div>
         </form>
       </div>

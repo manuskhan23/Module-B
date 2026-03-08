@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -8,113 +8,172 @@ import { Select } from '../../components/Select';
 import { Button } from '../../components/Button';
 import { DataGrid } from '../../components/DataGrid';
 import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, addDoc, query, getDocs, serverTimestamp, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 const schema = yup.object().shape({
   studentId: yup.string().required('Student is required'),
-  amount: yup.number().required('Amount is required').positive(),
+  amount: yup.number().typeError('Amount must be a number').required('Amount is required').positive(),
   feeType: yup.string().required('Fee type is required'),
   paymentMethod: yup.string().required('Payment method is required'),
-  transactionId: yup.string().required('Transaction ID is required'),
+  dueDate: yup.string().required('Due date is required'),
+  status: yup.string().required('Status is required'),
 });
 
 export const FeeSubmission = () => {
-  const [submissions, setSubmissions] = useState([
-    { id: 1, student: 'John Doe', amount: 5000, feeType: 'Tuition', date: '2024-01-15', status: 'Completed' },
-    { id: 2, student: 'Jane Smith', amount: 2000, feeType: 'Transport', date: '2024-01-14', status: 'Completed' },
-  ]);
+  const { user } = useAuth();
+  const [submissions, setSubmissions] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      status: 'Paid',
+    }
   });
 
-  const onSubmit = async (data) => {
+  useEffect(() => {
+    if (user) fetchData();
+  }, [user]);
+
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const newSubmission = {
-        id: submissions.length + 1,
-        student: data.studentId,
-        amount: data.amount,
-        feeType: data.feeType,
-        date: new Date().toISOString().split('T')[0],
-        status: 'Completed',
-      };
-      setSubmissions([...submissions, newSubmission]);
-      toast.success('Fee submitted successfully!');
-      reset();
+      // Fetch Students
+      const studentSnap = await getDocs(query(collection(db, 'students'), where('userId', '==', user.uid)));
+      setStudents(studentSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        value: doc.id,
+        label: doc.data().name
+      })));
+
+      // Fetch Submissions
+      const q = query(collection(db, 'fees'), where('userId', '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      setSubmissions(querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0)));
     } catch (error) {
-      toast.error('Failed to submit fee');
+      toast.error('Error fetching data: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setSubmitting(true);
+    try {
+      const studentName = students.find(s => s.value === data.studentId)?.label || '';
+      await addDoc(collection(db, 'fees'), {
+        ...data,
+        userId: user.uid,
+        studentName,
+        createdAt: serverTimestamp(),
+        paymentDate: new Date().toISOString().split('T')[0]
+      });
+      toast.success('Fee submission recorded!');
+      reset();
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to submit fee: ' + error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const columns = [
-    { field: 'student', headerName: 'Student' },
-    { field: 'amount', headerName: 'Amount', render: (val) => `₹${val}` },
+    { field: 'studentName', headerName: 'Student' },
     { field: 'feeType', headerName: 'Fee Type' },
-    { field: 'date', headerName: 'Date' },
-    { field: 'status', headerName: 'Status', render: (status) => <span className={`badge badge-${status.toLowerCase()}`}>{status}</span> },
+    { field: 'amount', headerName: 'Amount', render: (val) => `$${val}` },
+    { field: 'paymentDate', headerName: 'Payment Date' },
+    { field: 'dueDate', headerName: 'Due Date' },
+    {
+      field: 'status',
+      headerName: 'Status',
+      render: (status) => <span className={`badge badge-${status?.toLowerCase()}`}>{status}</span>
+    },
   ];
 
   return (
     <div className="page">
-      <PageHeader title="Fee Submission" subtitle="Record student fee payments" />
+      <PageHeader title="Fee Submission" subtitle="Record and view student fee payments" />
       <div className="page-content">
-        <div style={{ background: 'white', padding: '24px', borderRadius: '8px', marginBottom: '24px', border: '1px solid #E5E7EB' }}>
-          <h3 style={{ marginBottom: '20px' }}>Add Fee Submission</h3>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-grid">
-              <Select
-                label="Student"
-                {...register('studentId')}
-                options={[
-                  { value: 'john', label: 'John Doe' },
-                  { value: 'jane', label: 'Jane Smith' },
-                ]}
-                error={errors.studentId?.message}
-                required
-              />
-              <Input
-                label="Amount"
-                type="number"
-                {...register('amount')}
-                error={errors.amount?.message}
-                required
-              />
-              <Select
-                label="Fee Type"
-                {...register('feeType')}
-                options={[
-                  { value: 'tuition', label: 'Tuition' },
-                  { value: 'transport', label: 'Transport' },
-                  { value: 'uniform', label: 'Uniform' },
-                ]}
-                error={errors.feeType?.message}
-                required
-              />
-              <Select
-                label="Payment Method"
-                {...register('paymentMethod')}
-                options={[
-                  { value: 'cash', label: 'Cash' },
-                  { value: 'online', label: 'Online' },
-                  { value: 'cheque', label: 'Cheque' },
-                ]}
-                error={errors.paymentMethod?.message}
-                required
-              />
-              <Input
-                label="Transaction ID"
-                {...register('transactionId')}
-                error={errors.transactionId?.message}
-                required
-              />
-            </div>
-            <div className="form-actions">
-              <Button type="submit" variant="primary">Submit Fee</Button>
-            </div>
-          </form>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="form" style={{ marginBottom: '30px' }}>
+          <h3 style={{ marginBottom: '20px' }}>New Fee Record</h3>
+          <div className="form-grid">
+            <Select
+              label="Student"
+              {...register('studentId')}
+              options={students}
+              error={errors.studentId?.message}
+              required
+            />
+            <Select
+              label="Fee Type"
+              {...register('feeType')}
+              options={[
+                { value: 'Tuition Fee', label: 'Tuition Fee' },
+                { value: 'Library Fee', label: 'Library Fee' },
+                { value: 'Laboratory Fee', label: 'Laboratory Fee' },
+                { value: 'Transport Fee', label: 'Transport Fee' },
+                { value: 'Other', label: 'Other' },
+              ]}
+              error={errors.feeType?.message}
+              required
+            />
+            <Input
+              label="Amount"
+              type="number"
+              {...register('amount')}
+              error={errors.amount?.message}
+              required
+            />
+            <Input
+              label="Due Date"
+              type="date"
+              {...register('dueDate')}
+              error={errors.dueDate?.message}
+              required
+            />
+            <Select
+              label="Payment Method"
+              {...register('paymentMethod')}
+              options={[
+                { value: 'Cash', label: 'Cash' },
+                { value: 'Online', label: 'Online' },
+                { value: 'Bank Transfer', label: 'Bank Transfer' },
+              ]}
+              error={errors.paymentMethod?.message}
+              required
+            />
+            <Select
+              label="Status"
+              {...register('status')}
+              options={[
+                { value: 'Paid', label: 'Paid' },
+                { value: 'Pending', label: 'Pending' },
+              ]}
+              error={errors.status?.message}
+              required
+            />
+          </div>
+          <div className="form-actions">
+            <Button type="submit" variant="primary" disabled={submitting}>
+              {submitting ? 'Processing...' : 'Record Payment'}
+            </Button>
+          </div>
+        </form>
 
-        <h3 style={{ marginBottom: '16px' }}>Recent Submissions</h3>
-        <DataGrid columns={columns} rows={submissions} />
+        <div className="form">
+          <h3 style={{ marginBottom: '20px' }}>Fee History</h3>
+          <DataGrid columns={columns} rows={submissions} loading={loading} />
+        </div>
       </div>
     </div>
   );

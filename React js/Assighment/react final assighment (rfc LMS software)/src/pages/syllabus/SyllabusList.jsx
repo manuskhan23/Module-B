@@ -4,55 +4,83 @@ import { FiPlus } from 'react-icons/fi';
 import { PageHeader } from '../../components/PageHeader';
 import { DataGrid } from '../../components/DataGrid';
 import { Button } from '../../components/Button';
+import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, query, getDocs, deleteDoc, doc, orderBy, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 export const SyllabusList = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [syllabus, setSyllabus] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSyllabus();
-  }, []);
+    if (user) fetchSyllabus();
+  }, [user]);
 
   const fetchSyllabus = async () => {
     setLoading(true);
     try {
-      const mockData = [
-        { id: 1, class: '10-A', subject: 'Mathematics', chapters: 15, releaseDate: '2024-01-10', status: 'Released' },
-        { id: 2, class: '10-A', subject: 'English', chapters: 12, releaseDate: '2024-01-12', status: 'Released' },
-        { id: 3, class: '12-A', subject: 'Science', chapters: 18, releaseDate: '2024-01-15', status: 'Draft' },
-      ];
-      setSyllabus(mockData);
+      const q = query(
+        collection(db, 'syllabus'),
+        where('userId', '==', user.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const syllabusData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0));
+      setSyllabus(syllabusData);
+    } catch (error) {
+      toast.error('Error fetching syllabus: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this syllabus?')) {
+      try {
+        await deleteDoc(doc(db, 'syllabus', id));
+        toast.success('Syllabus deleted successfully');
+        fetchSyllabus();
+      } catch (error) {
+        toast.error('Failed to delete syllabus: ' + error.message);
+      }
+    }
+  };
+
   const columns = [
-    { field: 'class', headerName: 'Class' },
-    { field: 'subject', headerName: 'Subject' },
-    { field: 'chapters', headerName: 'Chapters' },
-    { field: 'releaseDate', headerName: 'Release Date' },
-    { field: 'status', headerName: 'Status', render: (status) => <span className={`badge badge-${status.toLowerCase()}`}>{status}</span> },
+    { field: 'subjectName', headerName: 'Subject' },
+    { field: 'grade', headerName: 'Grade' },
+    { field: 'duration', headerName: 'Duration' },
+    { field: 'topics', headerName: 'Topics' },
   ];
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Syllabus"
-        subtitle="Manage course syllabus"
+      <PageHeader
+        title="Syllabus List"
+        subtitle="Manage all course syllabus"
         actions={
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={() => navigate('/syllabus/add')}
           >
-            <FiPlus /> Create Syllabus
+            <FiPlus /> Add Syllabus
           </Button>
         }
       />
       <div className="page-content">
-        <DataGrid columns={columns} rows={syllabus} loading={loading} />
+        <DataGrid
+          columns={columns}
+          rows={syllabus}
+          loading={loading}
+          onEdit={(syl) => navigate(`/syllabus/edit/${syl.id}`)}
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );

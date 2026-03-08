@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -8,6 +8,9 @@ import { Input } from '../../components/Input';
 import { Select } from '../../components/Select';
 import { Button } from '../../components/Button';
 import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 const schema = yup.object().shape({
@@ -21,24 +24,95 @@ const schema = yup.object().shape({
 
 export const TeacherForm = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  const { user } = useAuth();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'subjects')
+        );
+        const querySnapshot = await getDocs(q);
+        const subjectsList = querySnapshot.docs.map(doc => ({
+          value: doc.data().subjectName,
+          label: doc.data().subjectName
+        }));
+        setSubjects(subjectsList);
+      } catch (error) {
+        toast.error('Error fetching subjects');
+      }
+    };
+
+    fetchSubjects();
+
+    if (id) {
+      const fetchTeacher = async () => {
+        try {
+          const docRef = doc(db, 'teachers', id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            reset(docSnap.data());
+          }
+        } catch (error) {
+          toast.error('Error fetching teacher data');
+        }
+      };
+      fetchTeacher();
+    }
+  }, [id, reset]);
+
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      toast.success('Teacher added successfully!');
+      if (id) {
+        const docRef = doc(db, 'teachers', id);
+        await updateDoc(docRef, {
+          ...data,
+          updatedAt: serverTimestamp(),
+        });
+        toast.success('Teacher updated successfully!');
+      } else {
+        // Check for duplicate email for THIS user
+        const q = query(
+          collection(db, 'teachers'),
+          where('userId', '==', user.uid),
+          where('email', '==', data.email)
+        );
+        const duplicateCheck = await getDocs(q);
+
+        if (!duplicateCheck.empty) {
+          toast.error('A teacher with this email already exists!');
+          setLoading(false);
+          return;
+        }
+
+        await addDoc(collection(db, 'teachers'), {
+          ...data,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+        });
+        toast.success('Teacher registered successfully!');
+      }
       navigate('/teachers');
     } catch (error) {
-      toast.error('Failed to save teacher');
+      toast.error('Failed to save teacher: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Add Teacher"
-        subtitle="Create a new teacher record"
+      <PageHeader
+        title={id ? 'Edit Teacher' : 'Add Teacher'}
+        subtitle={id ? 'Modify teacher record' : 'Create a new teacher record'}
         onBack={() => navigate('/teachers')}
       />
       <div className="page-content">
@@ -67,12 +141,7 @@ export const TeacherForm = () => {
             <Select
               label="Subject"
               {...register('subject')}
-              options={[
-                { value: 'mathematics', label: 'Mathematics' },
-                { value: 'english', label: 'English' },
-                { value: 'science', label: 'Science' },
-                { value: 'history', label: 'History' },
-              ]}
+              options={subjects}
               error={errors.subject?.message}
               required
             />
@@ -90,11 +159,14 @@ export const TeacherForm = () => {
             />
           </div>
           <div className="form-actions">
-            <Button type="submit" variant="primary">Save Teacher</Button>
-            <Button type="button" variant="secondary" onClick={() => navigate('/teachers')}>Cancel</Button>
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Saving...' : (id ? 'Update Teacher' : 'Save Teacher')}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => navigate('/teachers')} disabled={loading}>Cancel</Button>
           </div>
         </form>
       </div>
     </div>
   );
 };
+

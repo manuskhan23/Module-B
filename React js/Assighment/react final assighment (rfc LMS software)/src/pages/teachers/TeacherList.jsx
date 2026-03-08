@@ -1,55 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import { PageHeader } from '../../components/PageHeader';
 import { DataGrid } from '../../components/DataGrid';
 import { Button } from '../../components/Button';
-import { setTeachers, setLoading } from '../../store/slices/teacherSlice';
+import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, query, getDocs, deleteDoc, doc, orderBy, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 export const TeacherList = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { teachers, loading } = useSelector(state => state.teacher);
+  const { user } = useAuth();
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTeachers();
-  }, []);
+    if (user) fetchTeachers();
+  }, [user]);
 
   const fetchTeachers = async () => {
-    dispatch(setLoading(true));
+    setLoading(true);
     try {
-      const mockData = [
-        { id: 1, name: 'Mr. Smith', email: 'smith@example.com', subject: 'Mathematics', phone: '9876543210', status: 'Active' },
-        { id: 2, name: 'Ms. Johnson', email: 'johnson@example.com', subject: 'English', phone: '9876543211', status: 'Active' },
-      ];
-      dispatch(setTeachers(mockData));
+      const q = query(
+        collection(db, 'teachers'),
+        where('userId', '==', user.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const teachersData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a, b) => {
+        // Sort by createdAt (Firestore Timestamp or Date or Number)
+        const dateA = a.createdAt?.toDate?.() || (a.createdAt ? new Date(a.createdAt) : 0);
+        const dateB = b.createdAt?.toDate?.() || (b.createdAt ? new Date(b.createdAt) : 0);
+        return dateB - dateA;
+      });
+      setTeachers(teachersData);
+    } catch (error) {
+      toast.error('Error fetching teachers: ' + error.message);
     } finally {
-      dispatch(setLoading(false));
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this teacher?')) {
+      try {
+        await deleteDoc(doc(db, 'teachers', id));
+        toast.success('Teacher deleted successfully');
+        fetchTeachers();
+      } catch (error) {
+        toast.error('Failed to delete teacher: ' + error.message);
+      }
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Name' },
+    { field: 'name', headerName: 'Full Name' },
     { field: 'email', headerName: 'Email' },
     { field: 'subject', headerName: 'Subject' },
     { field: 'phone', headerName: 'Phone' },
-    { 
-      field: 'status', 
-      headerName: 'Status',
-      render: (status) => <span className={`badge badge-${status.toLowerCase()}`}>{status}</span>
-    },
+    { field: 'qualification', headerName: 'Qualification' },
   ];
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Teachers"
+      <PageHeader
+        title="Teachers List"
         subtitle="Manage all teachers"
         actions={
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={() => navigate('/teachers/add')}
           >
             <FiPlus /> Add Teacher
@@ -57,12 +80,12 @@ export const TeacherList = () => {
         }
       />
       <div className="page-content">
-        <DataGrid 
-          columns={columns} 
+        <DataGrid
+          columns={columns}
           rows={teachers}
           loading={loading}
           onEdit={(teacher) => navigate(`/teachers/edit/${teacher.id}`)}
-          onDelete={(id) => console.log('Delete:', id)}
+          onDelete={handleDelete}
         />
       </div>
     </div>

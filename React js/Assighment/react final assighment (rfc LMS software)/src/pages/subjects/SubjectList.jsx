@@ -4,54 +4,83 @@ import { FiPlus } from 'react-icons/fi';
 import { PageHeader } from '../../components/PageHeader';
 import { DataGrid } from '../../components/DataGrid';
 import { Button } from '../../components/Button';
+import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, query, getDocs, deleteDoc, doc, orderBy, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 export const SubjectList = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSubjects();
-  }, []);
+    if (user) fetchSubjects();
+  }, [user]);
 
   const fetchSubjects = async () => {
     setLoading(true);
     try {
-      const mockData = [
-        { id: 1, name: 'Mathematics', code: 'MTH101', teacher: 'Mr. Smith', credits: 4 },
-        { id: 2, name: 'English', code: 'ENG101', teacher: 'Ms. Johnson', credits: 3 },
-        { id: 3, name: 'Science', code: 'SCI101', teacher: 'Dr. Brown', credits: 4 },
-      ];
-      setSubjects(mockData);
+      const q = query(
+        collection(db, 'subjects'),
+        where('userId', '==', user.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const subjectsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })).sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0));
+      setSubjects(subjectsData);
+    } catch (error) {
+      toast.error('Error fetching subjects: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this subject?')) {
+      try {
+        await deleteDoc(doc(db, 'subjects', id));
+        toast.success('Subject deleted successfully');
+        fetchSubjects();
+      } catch (error) {
+        toast.error('Failed to delete subject: ' + error.message);
+      }
+    }
+  };
+
   const columns = [
-    { field: 'code', headerName: 'Code' },
-    { field: 'name', headerName: 'Subject' },
-    { field: 'teacher', headerName: 'Teacher' },
+    { field: 'subjectCode', headerName: 'Code' },
+    { field: 'subjectName', headerName: 'Subject' },
+    { field: 'teacherName', headerName: 'Teacher' },
     { field: 'credits', headerName: 'Credits' },
   ];
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Subjects"
-        subtitle="Manage subjects"
+      <PageHeader
+        title="Subject List"
+        subtitle="Manage all subjects"
         actions={
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={() => navigate('/subjects/add')}
           >
-            <FiPlus /> Add Subject
+            <FiPlus /> Create Subject
           </Button>
         }
       />
       <div className="page-content">
-        <DataGrid columns={columns} rows={subjects} loading={loading} />
+        <DataGrid
+          columns={columns}
+          rows={subjects}
+          loading={loading}
+          onEdit={(subj) => navigate(`/subjects/edit/${subj.id}`)}
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );

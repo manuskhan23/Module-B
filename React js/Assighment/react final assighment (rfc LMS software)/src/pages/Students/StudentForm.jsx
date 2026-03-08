@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { PageHeader } from '../../components/PageHeader';
 import { Input } from '../../components/Input';
 import { Select } from '../../components/Select';
-import { DatePicker } from '../../components/DatePicker';
 import { Button } from '../../components/Button';
 import { toast } from 'react-toastify';
+import { db } from '../../config/firebase';
+import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/pages.css';
 
 const schema = yup.object().shape({
@@ -16,7 +18,7 @@ const schema = yup.object().shape({
   email: yup.string().email('Invalid email').required('Email is required'),
   rollNo: yup.string().required('Roll No is required'),
   dateOfBirth: yup.string().required('DOB is required'),
-  class: yup.string().required('Class is required'),
+  grade: yup.string().required('Grade is required'),
   gender: yup.string().required('Gender is required'),
   address: yup.string().required('Address is required'),
   phone: yup.string().required('Phone is required'),
@@ -24,25 +26,98 @@ const schema = yup.object().shape({
 
 export const StudentForm = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const { user } = useAuth();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'classes'),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const classesList = querySnapshot.docs.map(doc => ({
+          value: doc.data().className,
+          label: doc.data().className
+        }));
+        setClasses(classesList);
+      } catch (error) {
+        console.error(error);
+        toast.error('Error fetching classes');
+      }
+    };
+
+    fetchClasses();
+
+    if (id) {
+      const fetchStudent = async () => {
+        try {
+          const docRef = doc(db, 'students', id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            reset(docSnap.data());
+          }
+        } catch (error) {
+          toast.error('Error fetching student data');
+        }
+      };
+      fetchStudent();
+    }
+  }, [id, reset]);
+
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      // Replace with API call
-      toast.success('Student added successfully!');
+      if (id) {
+        const docRef = doc(db, 'students', id);
+        await updateDoc(docRef, {
+          ...data,
+          updatedAt: serverTimestamp(),
+        });
+        toast.success('Student updated successfully!');
+      } else {
+        // Check for duplicate roll number in the same grade for THIS user
+        const q = query(
+          collection(db, 'students'),
+          where('userId', '==', user.uid),
+          where('rollNo', '==', data.rollNo),
+          where('grade', '==', data.grade)
+        );
+        const duplicateCheck = await getDocs(q);
+
+        if (!duplicateCheck.empty) {
+          toast.error('A student with this Roll No already exists in this grade!');
+          setLoading(false);
+          return;
+        }
+
+        await addDoc(collection(db, 'students'), {
+          ...data,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+        });
+        toast.success('Student registered successfully!');
+      }
       navigate('/students');
     } catch (error) {
-      toast.error('Failed to save student');
+      toast.error('Failed to save student: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="page">
-      <PageHeader 
-        title="Add Student"
-        subtitle="Create a new student record"
+      <PageHeader
+        title={id ? 'Edit Student' : 'Add Student'}
+        subtitle={id ? 'Modify student record' : 'Create a new student record'}
         onBack={() => navigate('/students')}
       />
       <div className="page-content">
@@ -74,10 +149,10 @@ export const StudentForm = () => {
               error={errors.phone?.message}
               required
             />
-            <DatePicker
+            <Input
               label="Date of Birth"
-              value=""
-              onChange={(val) => setValue('dateOfBirth', val)}
+              type="date"
+              {...register('dateOfBirth')}
               error={errors.dateOfBirth?.message}
               required
             />
@@ -93,14 +168,10 @@ export const StudentForm = () => {
               required
             />
             <Select
-              label="Class"
-              {...register('class')}
-              options={[
-                { value: '10-A', label: '10-A' },
-                { value: '10-B', label: '10-B' },
-                { value: '12-A', label: '12-A' },
-              ]}
-              error={errors.class?.message}
+              label="Grade"
+              {...register('grade')}
+              options={classes}
+              error={errors.grade?.message}
               required
             />
             <Input
@@ -111,8 +182,10 @@ export const StudentForm = () => {
             />
           </div>
           <div className="form-actions">
-            <Button type="submit" variant="primary">Save Student</Button>
-            <Button type="button" variant="secondary" onClick={() => navigate('/students')}>Cancel</Button>
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Saving...' : (id ? 'Update Student' : 'Save Student')}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => navigate('/students')} disabled={loading}>Cancel</Button>
           </div>
         </form>
       </div>

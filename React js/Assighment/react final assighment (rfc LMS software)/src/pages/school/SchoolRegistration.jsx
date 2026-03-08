@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-// import { yupResolver } from '@hookform/resolvers/yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { PageHeader } from '../../components/PageHeader';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
+import { db } from '../../config/firebase';
+import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp, query, where } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import '../../styles/pages.css';
 
@@ -22,23 +25,63 @@ const schema = yup.object().shape({
 });
 
 export const SchoolRegistration = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: yupResolver(schema),
   });
 
+  useEffect(() => {
+    if (id) {
+      const fetchSchool = async () => {
+        try {
+          const docRef = doc(db, 'schools', id);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            reset(docSnap.data());
+          }
+        } catch (error) {
+          toast.error('Error fetching school data');
+        }
+      };
+      fetchSchool();
+    }
+  }, [id, reset]);
+
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      toast.success('School registered successfully!');
+      if (id) {
+        const docRef = doc(db, 'schools', id);
+        await updateDoc(docRef, {
+          ...data,
+          updatedAt: serverTimestamp(),
+        });
+        toast.success('School updated successfully!');
+      } else {
+        await addDoc(collection(db, 'schools'), {
+          ...data,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+        });
+        toast.success('School registered successfully!');
+      }
+      navigate('/school');
     } catch (error) {
-      toast.error('Failed to register school');
+      toast.error('Failed to save school details: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="page">
       <PageHeader
-        title="School Registration"
-        subtitle="Register school and admin staff"
+        title={id ? 'Edit School' : 'School Registration'}
+        subtitle={id ? 'Update school information' : 'Register a new school'}
+        onBack={() => navigate('/school')}
       />
       <div className="page-content">
         <form onSubmit={handleSubmit(onSubmit)} className="form">
@@ -103,8 +146,10 @@ export const SchoolRegistration = () => {
           </div>
 
           <div className="form-actions">
-            <Button type="submit" variant="primary">Register School</Button>
-            <Button type="button" variant="secondary">Cancel</Button>
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Saving...' : (id ? 'Update School' : 'Register School')}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => navigate('/school')} disabled={loading}>Cancel</Button>
           </div>
         </form>
       </div>

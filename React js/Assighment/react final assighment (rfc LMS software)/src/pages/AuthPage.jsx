@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/auth.css';
+import img from '../auth.png'
 
 export const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,8 +11,15 @@ export const AuthPage = () => {
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { signin, signup, signInWithGoogle } = useAuth();
+  const { signin, signup, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,10 +124,10 @@ export const AuthPage = () => {
             disabled={loading}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M23.745 12.27c0-.79-.1-1.54-.25-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.85c2.27-2.09 3.57-5.17 3.57-8.82z" fill="#4285F4"/>
-              <path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.85-3c-1.08.72-2.45 1.13-4.08 1.13-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.05 21.3 7.31 24 12 24z" fill="#34A853"/>
-              <path d="M5.27 14.26c-.22-.72-.35-1.49-.35-2.26s.13-1.54.35-2.26V7.07H1.29C.56 8.55 0 10.22 0 12s.56 3.45 1.29 4.93l3.98-3.67z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.92 2.04 15.24 1 12 1 7.31 1 3.05 3.71 1.29 7.07l3.98 3.09c.95-2.85 3.6-4.78 6.73-4.78z" fill="#EA4335"/>
+              <path d="M23.745 12.27c0-.79-.1-1.54-.25-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.85c2.27-2.09 3.57-5.17 3.57-8.82z" fill="#4285F4" />
+              <path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.85-3c-1.08.72-2.45 1.13-4.08 1.13-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.05 21.3 7.31 24 12 24z" fill="#34A853" />
+              <path d="M5.27 14.26c-.22-.72-.35-1.49-.35-2.26s.13-1.54.35-2.26V7.07H1.29C.56 8.55 0 10.22 0 12s.56 3.45 1.29 4.93l3.98-3.67z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.92 2.04 15.24 1 12 1 7.31 1 3.05 3.71 1.29 7.07l3.98 3.09c.95-2.85 3.6-4.78 6.73-4.78z" fill="#EA4335" />
             </svg>
             {loading ? 'Processing...' : 'Continue with Google'}
           </button>
@@ -128,6 +136,9 @@ export const AuthPage = () => {
             {isLogin ? "Don't have an account? " : 'Already have an account? '}
             <button
               type="button"
+              style={{
+                marginLeft: '155px'
+              }}
               onClick={() => {
                 setIsLogin(!isLogin);
                 setError('');
@@ -136,6 +147,7 @@ export const AuthPage = () => {
                 setFullName('');
               }}
               className="toggle-btn"
+              id='ee'
             >
               {isLogin ? 'Sign Up' : 'Sign In'}
             </button>
@@ -143,30 +155,9 @@ export const AuthPage = () => {
         </div>
       </div>
 
-      {/* Right Side - Gradient */}
+      {/* Right Side - Image */}
       <div className="auth-right">
-        <div className="gradient-content">
-          <h2>{isLogin ? 'New to LMS?' : 'Welcome to'} LMS Platform</h2>
-          <p>
-            {isLogin
-              ? 'Join thousands of students learning and growing their skills'
-              : 'Your gateway to quality education and personal growth'}
-          </p>
-          <div className="features">
-            <div className="feature-item">
-              <div className="feature-icon">📚</div>
-              <span>Comprehensive Courses</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">👥</div>
-              <span>Expert Instructors</span>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🎓</div>
-              <span>Certifications</span>
-            </div>
-          </div>
-        </div>
+        <img src={img} alt="Authentication" className="auth-image" />
       </div>
     </div>
   );
