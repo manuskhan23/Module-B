@@ -1,0 +1,5 @@
+nodejs ==> js enviroment (cmd)
+
+expressjs ==> nodejs framework
+
+Mongodb ==> nosql Database

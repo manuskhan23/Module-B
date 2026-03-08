@@ -1,0 +1,6 @@
+
+https://jsonplaceholder.typicode.com/todos/1
+
+https://jsonplaceholder.typicode.com ==> api
+
+/todos/1 ==> end point

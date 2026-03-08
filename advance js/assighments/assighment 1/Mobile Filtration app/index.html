@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mobile Finder</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="mainBox" class="box">
+    <h2>Select Mobile</h2>
+
+    <label>Brand:</label>
+    <select id="brandSelect">
+        <option value="">Select brand</option>
+    </select>
+
+    <label>Model:</label>
+    <select id="modelSelect" disabled>
+        <option value="">Select model</option>
+    </select>
+
+    <button id="searchBtn" disabled onclick="search()">Search</button>
+
+    <div id="resultBox" class="result"></div>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
