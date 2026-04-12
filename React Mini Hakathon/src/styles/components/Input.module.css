@@ -1,0 +1,60 @@
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e8449;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #a9dfbf;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+}
+
+.withIcon {
+  padding-left: 40px;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  color: #2ecc71;
+  pointer-events: none;
+}
+
+.error {
+  border-color: #e74c3c;
+}
+
+.error:focus {
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.errorMessage {
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: 500;
+}

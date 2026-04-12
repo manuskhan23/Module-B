@@ -1,0 +1,287 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: white;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.15);
+  border: 1px solid #a9dfbf;
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e8449;
+  margin: 0 0 10px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #1e8449;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e8449;
+}
+
+.input {
+  padding: 12px 15px;
+  border: 1px solid #a9dfbf;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2ecc71;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+}
+
+.inputRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.button {
+  padding: 12px;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #1e8449;
+}
+
+.link {
+  color: #2ecc71;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: #27ae60;
+}
+
+.errorMessage {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.successMessage {
+  color: #27ae60;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.passwordStrength {
+  margin-top: 5px;
+}
+
+.strengthBar {
+  height: 4px;
+  background: #a9dfbf;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.weak {
+  width: 33%;
+  background: #e74c3c;
+}
+
+.medium {
+  width: 66%;
+  background: #f39c12;
+}
+
+.strong {
+  width: 100%;
+  background: #27ae60;
+}
+
+.strengthText {
+  font-size: 11px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.weakText {
+  color: #e74c3c;
+}
+
+.mediumText {
+  color: #f39c12;
+}
+
+.strongText {
+  color: #27ae60;
+}
+
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  margin: 10px 0;
+}
+
+.checkbox {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  accent-color: #2ecc71;
+  margin-top: 2px;
+}
+
+.termsText {
+  color: #1e8449;
+  line-height: 1.4;
+}
+
+.passwordContainer {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.generateBtn {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  height: 40px;
+  width: 40px;
+}
+
+.generateBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+}
+
+.generateBtn:active {
+  transform: translateY(0);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: #a9dfbf;
+}
+
+.dividerText {
+  font-size: 12px;
+  color: #1e8449;
+}
+
+.socialButtons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.socialButton {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #a9dfbf;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.socialButton:hover {
+  border-color: #2ecc71;
+  background: #eafaf1;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 25px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .inputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .button {
+    font-size: 15px;
+  }
+}
