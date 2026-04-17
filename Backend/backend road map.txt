@@ -1,4 +1,4 @@
-nodejs ==> js enviroment (cmd)
+nodejs ==> js runtime enviroment (cmd)
 
 expressjs ==> nodejs framework
 
