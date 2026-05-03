@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/old-path", "destination": "/new-path" }
+  ],
+  "headers": [
+    {
+      "source": "app.js",
+      "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }]
+    }
+  ],
+  "crons": [{ "path": "/api/daily-task", "schedule": "0 0 * * *" }]
+}
